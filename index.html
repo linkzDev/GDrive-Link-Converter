@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDrive Link Converter - Minimalist</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #fafafa;
+            color: #111111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 540px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            border: 1px solid #eaeaea;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            color: #000000;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #888888;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            color: #666666;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: #f5f5f7;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: #000000;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: #000000;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+        }
+
+        .btn:hover {
+            background-color: #222222;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid #f0f0f0;
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .output-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .output-box input {
+            padding-right: 75px;
+            background-color: #f5f5f7;
+            font-family: monospace;
+            font-size: 12px;
+            color: #333333;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 8px;
+            padding: 6px 12px;
+            background-color: #ffffff;
+            border: 1px solid #e5e5e7;
+            color: #555555;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+
+        .copy-btn:hover {
+            border-color: #000000;
+            color: #000000;
+        }
+
+        .preview-container {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-box {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-top: 12px;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        .alert {
+            background-color: #ff3b30;
+            color: #ffffff;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>GDrive Converter</h1>
+    <div class="subtitle">Ubah link Google Drive menjadi URL aset gambar langsung.</div>
+
+    <div id="errorAlert" class="alert">Tautan tidak valid. Mohon periksa kembali.</div>
+
+    <div class="input-group">
+        <label for="inputUrl">Link Google Drive</label>
+        <div class="input-wrapper">
+            <input type="text" id="inputUrl" placeholder="Tempel tautan /file/d/ disini..." autocomplete="off">
+        </div>
+    </div>
+
+    <button class="btn" onclick="convertLink()">Convert</button>
+
+    <div id="resultSection" class="result-section">
+        <div class="input-group">
+            <label>Format Avatar (1:1 Terpotong Tengah)</label>
+            <div class="output-box">
+                <input type="text" id="thumbUrl" readonly>
+                <button class="copy-btn" onclick="copyToClipboard('thumbUrl')">Copy</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Format Resolusi Asli</label>
+            <div class="output-box">
+                <input type="text" id="directUrl" readonly>
+                <button class="copy-btn" onclick="copyToClipboard('directUrl')">Copy</button>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <label>Pratinjau Hasil</label>
+            <img id="imagePreview" src="" alt="Preview Gambar" class="preview-box">
+        </div>
+    </div>
+</div>
+
+<script>
+    function extractFileId(url) {
+        const regex = /\/d\/([a-zA-Z0-9_-]{25,})/;
+        const match = url.match(regex);
+        if (match && match[1]) {
+            return match[1];
+        }
+        if (url.trim().length >= 25 && !url.includes('/')) {
+            return url.trim();
+        }
+        return null;
+    }
+
+    function convertLink() {
+        const inputUrl = document.getElementById('inputUrl').value;
+        const fileId = extractFileId(inputUrl);
+        
+        const errorAlert = document.getElementById('errorAlert');
+        const resultSection = document.getElementById('resultSection');
+
+        if (!fileId) {
+            errorAlert.style.display = 'block';
+            resultSection.classList.remove('active');
+            return;
+        }
+
+        errorAlert.style.display = 'none';
+
+        const thumbGenerated = `https://drive.google.com/thumbnail?sz=w400-h400&id=${fileId}`;
+        const directGenerated = `https://drive.google.com/uc?export=view&id=${fileId}`;
+
+        document.getElementById('thumbUrl').value = thumbGenerated;
+        document.getElementById('directUrl').value = directGenerated;
+        document.getElementById('imagePreview').src = thumbGenerated;
+
+        resultSection.classList.add('active');
+    }
+
+    function copyToClipboard(elementId) {
+        const copyText = document.getElementById(elementId);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            const btn = copyText.nextElementSibling;
+            const originalText = btn.innerText;
+            btn.innerText = 'Copied';
+            btn.style.borderColor = '#000000';
+            btn.style.color = '#000000';
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.borderColor = '#e5e5e7';
+                btn.style.color = '#555555';
+            }, 1200);
+        }).catch(err => {
+            console.error('Gagal menyalin:', err);
+        });
+    }
+</script>
+
+</body>
+</html>
